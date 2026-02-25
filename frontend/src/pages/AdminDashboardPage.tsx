@@ -26,6 +26,16 @@ const grades = [
   '3o Ano EM'
 ];
 
+const gradeOrder = new Map(grades.map((grade, index) => [grade, index]));
+
+function compareResults(a: ResultRow, b: ResultRow) {
+  const orderA = gradeOrder.get(a.gradeYear) ?? Number.MAX_SAFE_INTEGER;
+  const orderB = gradeOrder.get(b.gradeYear) ?? Number.MAX_SAFE_INTEGER;
+  if (orderA !== orderB) return orderA - orderB;
+  if (a.classLetter !== b.classLetter) return a.classLetter.localeCompare(b.classLetter);
+  return b.votes - a.votes;
+}
+
 export function AdminDashboardPage() {
   const [pendentes, setPendentes] = useState<Candidate[]>([]);
   const [aprovados, setAprovados] = useState<Candidate[]>([]);
@@ -112,9 +122,10 @@ export function AdminDashboardPage() {
 
   async function exportResultsCsv() {
     const latest = await fetchResults(getResultFilters());
+    const sorted = [...latest].sort(compareResults);
     const csv = toCsv(
-      ['id', 'name', 'gradeYear', 'classLetter', 'votes'],
-      latest.map((r) => [r.id, r.name, r.gradeYear, r.classLetter, r.votes])
+      ['ano', 'turma', 'candidato', 'votos'],
+      sorted.map((r) => [r.gradeYear, r.classLetter, r.name, r.votes])
     );
     downloadCsv('resultados.csv', csv);
   }
