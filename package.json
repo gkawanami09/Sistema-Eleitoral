@@ -2,13 +2,11 @@
   "name": "sistema-eleitoral",
   "private": true,
   "version": "1.0.0",
-  "workspaces": ["backend", "frontend"],
+  "workspaces": ["frontend"],
   "scripts": {
     "install:all": "npm install --workspaces",
-    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
-    "build": "npm run build -w backend && npm run build -w frontend"
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build -w frontend"
   },
-  "devDependencies": {
-    "concurrently": "^9.1.2"
-  }
+  "devDependencies": {}
 }

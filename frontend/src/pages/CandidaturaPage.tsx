@@ -1,19 +1,19 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { api } from '../api/client';
+﻿import { FormEvent, useEffect, useState } from 'react';
+import { createCandidate, fetchPhase } from '../api/supabase';
 import { Toast } from '../components/Toast';
 import { Phase } from '../types';
 
 const grades = [
-  '3º Ano EF',
-  '4º Ano EF',
-  '5º Ano EF',
-  '6º Ano EF',
-  '7º Ano EF',
-  '8º Ano EF',
-  '9º Ano EF',
-  '1º Ano EM',
-  '2º Ano EM',
-  '3º Ano EM'
+  '3o Ano EF',
+  '4o Ano EF',
+  '5o Ano EF',
+  '6o Ano EF',
+  '7o Ano EF',
+  '8o Ano EF',
+  '9o Ano EF',
+  '1o Ano EM',
+  '2o Ano EM',
+  '3o Ano EM'
 ];
 
 export function CandidaturaPage() {
@@ -25,7 +25,9 @@ export function CandidaturaPage() {
   const [phase, setPhase] = useState<Phase>('CANDIDATURA');
 
   useEffect(() => {
-    api.get('/settings/phase').then((res) => setPhase(res.data.phase));
+    fetchPhase()
+      .then((value) => setPhase(value))
+      .catch(() => setPhase('CANDIDATURA'));
   }, []);
 
   async function submit(event: FormEvent) {
@@ -37,13 +39,13 @@ export function CandidaturaPage() {
 
     try {
       setLoading(true);
-      await api.post('/candidates', { name, gradeYear, classLetter });
+      await createCandidate({ name, gradeYear, classLetter: classLetter as 'A' | 'B' | 'C' });
       setToast({ msg: 'Candidatura feita com sucesso!', type: 'success' });
       setName('');
       setGradeYear('');
       setClassLetter('');
     } catch (error: any) {
-      setToast({ msg: error?.response?.data?.message ?? 'Erro ao cadastrar candidatura.', type: 'error' });
+      setToast({ msg: error?.message ?? 'Erro ao cadastrar candidatura.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -52,10 +54,10 @@ export function CandidaturaPage() {
   return (
     <section className="mx-auto max-w-2xl rounded-2xl border bg-white p-6 shadow-lg">
       <h1 className="text-3xl font-black text-primary">Cadastro de Candidatura</h1>
-      <p className="mt-1 text-slate-600">Preencha rápido e passe para a próxima pessoa da fila.</p>
+      <p className="mt-1 text-slate-600">Preencha rapido e passe para a proxima pessoa da fila.</p>
       {phase !== 'CANDIDATURA' && (
         <p className="mt-3 rounded-lg bg-amber-100 p-3 font-semibold text-amber-800">
-          A fase atual é {phase}. Candidaturas podem estar bloqueadas.
+          A fase atual e {phase}. Candidaturas podem estar bloqueadas.
         </p>
       )}
       <form onSubmit={submit} className="mt-6 space-y-4">
@@ -67,7 +69,7 @@ export function CandidaturaPage() {
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <select value={gradeYear} onChange={(e) => setGradeYear(e.target.value)} className="rounded-xl border p-4">
-            <option value="">Selecione o Ano/Série</option>
+            <option value="">Selecione o Ano/Serie</option>
             {grades.map((grade) => (
               <option key={grade} value={grade}>
                 {grade}

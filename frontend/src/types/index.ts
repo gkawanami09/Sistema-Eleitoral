@@ -7,6 +7,7 @@ export interface Candidate {
   gradeYear: string;
   classLetter: 'A' | 'B' | 'C';
   status: CandidateStatus;
+  createdAt?: string;
 }
 
 export interface ResultRow {

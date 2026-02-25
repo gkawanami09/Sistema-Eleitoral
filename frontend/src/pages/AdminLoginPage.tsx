@@ -1,8 +1,9 @@
-import { FormEvent, useState } from 'react';
+﻿import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, setAdminToken } from '../api/client';
+import { signInAdmin } from '../api/supabase';
 
 export function AdminLoginPage() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,11 +13,10 @@ export function AdminLoginPage() {
     event.preventDefault();
     try {
       setLoading(true);
-      const res = await api.post('/admin/login', { password });
-      setAdminToken(res.data.token);
+      await signInAdmin(email, password);
       navigate('/admin/dashboard');
     } catch {
-      setError('Senha inválida.');
+      setError('Credenciais invalidas.');
     } finally {
       setLoading(false);
     }
@@ -27,9 +27,16 @@ export function AdminLoginPage() {
       <h1 className="text-2xl font-black text-primary">Admin</h1>
       <form onSubmit={submit} className="mt-4 space-y-3">
         <input
+          type="email"
+          className="w-full rounded-xl border p-3"
+          placeholder="Email do admin"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
           type="password"
           className="w-full rounded-xl border p-3"
-          placeholder="Digite a senha"
+          placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
