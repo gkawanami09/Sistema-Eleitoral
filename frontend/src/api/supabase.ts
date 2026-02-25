@@ -76,7 +76,10 @@ export async function createCandidate(payload: {
   if (error) throw error;
 }
 
-export async function fetchCandidates(status?: CandidateStatus): Promise<Candidate[]> {
+export async function fetchCandidates(
+  status?: CandidateStatus,
+  filters?: { gradeYear?: string; classLetter?: 'A' | 'B' | 'C' }
+): Promise<Candidate[]> {
   let query = getSupabase()
     .from('candidates')
     .select('id, name, grade_year, class_letter, status, created_at')
@@ -84,6 +87,12 @@ export async function fetchCandidates(status?: CandidateStatus): Promise<Candida
 
   if (status) {
     query = query.eq('status', status);
+  }
+  if (filters?.gradeYear) {
+    query = query.eq('grade_year', filters.gradeYear);
+  }
+  if (filters?.classLetter) {
+    query = query.eq('class_letter', filters.classLetter);
   }
 
   const { data, error } = await query;
