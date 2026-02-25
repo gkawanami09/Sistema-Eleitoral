@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum CandidateStatus {
+  PENDENTE
+  APROVADO
+  REJEITADO
+}
+
+model Candidate {
+  id          Int             @id @default(autoincrement())
+  name        String
+  gradeYear   String
+  classLetter String
+  status      CandidateStatus @default(PENDENTE)
+  createdAt   DateTime        @default(now())
+  votes       Vote[]
+}
+
+model Vote {
+  id          Int      @id @default(autoincrement())
+  candidateId Int
+  createdAt   DateTime @default(now())
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  key   String @id
+  value String
+}
