@@ -26,6 +26,16 @@ export function VotacaoPage() {
   const [gradeYear, setGradeYear] = useState('');
   const [classLetter, setClassLetter] = useState('');
 
+  function playUrnaSound() {
+    try {
+      const audio = new Audio('/sounds/urna.mp3');
+      audio.volume = 0.8;
+      void audio.play();
+    } catch {
+      // noop
+    }
+  }
+
   async function load() {
     setLoading(true);
     try {
@@ -70,6 +80,7 @@ export function VotacaoPage() {
     try {
       setSending(true);
       await createVote(selected);
+      playUrnaSound();
       setToast({ msg: 'Voto registrado com sucesso!', type: 'success' });
       setSelected(null);
     } catch (error: any) {
