@@ -32,7 +32,7 @@ export function VotacaoPage() {
       const phaseRes = await fetchPhase();
       setPhase(phaseRes);
     } catch (error: any) {
-      setToast({ msg: error?.message ?? 'Falha ao carregar votacao.', type: 'error' });
+      setToast({ msg: error?.message ?? 'Falha ao carregar votação.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -79,17 +79,17 @@ export function VotacaoPage() {
     }
   }
 
-  if (loading) return <p className="p-6 text-center font-semibold">Carregando votacao...</p>;
+  if (loading) return <p className="p-6 text-center font-semibold">Carregando votação...</p>;
   if (phase === 'CANDIDATURA') {
-    return <p className="rounded-xl bg-amber-100 p-6 text-center font-bold">A votacao ainda nao comecou.</p>;
+    return <p className="rounded-xl bg-amber-100 p-6 text-center font-bold">A votação ainda não começou.</p>;
   }
   if (phase === 'ENCERRADA') {
-    return <p className="rounded-xl bg-slate-200 p-6 text-center font-bold">Votacao encerrada.</p>;
+    return <p className="rounded-xl bg-slate-200 p-6 text-center font-bold">Votação encerrada.</p>;
   }
 
   return (
     <section>
-      <h1 className="mb-4 text-3xl font-black text-primary">Votacao</h1>
+      <h1 className="mb-4 text-3xl font-black text-primary">Votação</h1>
 
       <div className="mb-4 grid gap-4 sm:grid-cols-2">
         <select value={gradeYear} onChange={(e) => setGradeYear(e.target.value)} className="rounded-xl border p-4">

@@ -13,6 +13,19 @@ import {
 } from '../api/supabase';
 import { downloadCsv, toCsv } from '../utils/csv';
 
+const grades = [
+  '3o Ano EF',
+  '4o Ano EF',
+  '5o Ano EF',
+  '6o Ano EF',
+  '7o Ano EF',
+  '8o Ano EF',
+  '9o Ano EF',
+  '1o Ano EM',
+  '2o Ano EM',
+  '3o Ano EM'
+];
+
 export function AdminDashboardPage() {
   const [pendentes, setPendentes] = useState<Candidate[]>([]);
   const [aprovados, setAprovados] = useState<Candidate[]>([]);
@@ -21,18 +34,29 @@ export function AdminDashboardPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [scope, setScope] = useState<'VOTOS' | 'TUDO'>('VOTOS');
   const [loading, setLoading] = useState(true);
+  const [resultGradeYear, setResultGradeYear] = useState('');
+  const [resultClassLetter, setResultClassLetter] = useState('');
+
+  function getResultFilters() {
+    if (!resultGradeYear || !resultClassLetter) return undefined;
+    return { gradeYear: resultGradeYear, classLetter: resultClassLetter as 'A' | 'B' | 'C' };
+  }
+
+  async function loadResults() {
+    const filtered = await fetchResults(getResultFilters());
+    setResults(filtered);
+  }
 
   async function load() {
-    const [pendingRes, approvedRes, resultRes, phaseRes] = await Promise.all([
+    const [pendingRes, approvedRes, phaseRes] = await Promise.all([
       fetchCandidates('PENDENTE'),
       fetchCandidates('APROVADO'),
-      fetchResults(),
       fetchPhase()
     ]);
     setPendentes(pendingRes);
     setAprovados(approvedRes);
-    setResults(resultRes);
     setPhaseState(phaseRes);
+    await loadResults();
   }
 
   useEffect(() => {
@@ -54,6 +78,12 @@ export function AdminDashboardPage() {
 
     void init();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      void loadResults();
+    }
+  }, [resultGradeYear, resultClassLetter, loading]);
 
   async function updateCandidate(id: number, status: 'APROVADO' | 'REJEITADO') {
     await updateCandidateStatus(id, status);
@@ -81,7 +111,7 @@ export function AdminDashboardPage() {
   }
 
   async function exportResultsCsv() {
-    const latest = await fetchResults();
+    const latest = await fetchResults(getResultFilters());
     const csv = toCsv(
       ['id', 'name', 'gradeYear', 'classLetter', 'votes'],
       latest.map((r) => [r.id, r.name, r.gradeYear, r.classLetter, r.votes])
@@ -156,7 +186,26 @@ export function AdminDashboardPage() {
 
       <div className="rounded-xl border bg-white p-4">
         <h2 className="font-bold">Resultados (maior para menor)</h2>
-        <ul className="mt-2 space-y-2">
+        <p className="mt-1 text-sm text-slate-500">Filtro opcional por ano e turma.</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <select value={resultGradeYear} onChange={(e) => setResultGradeYear(e.target.value)} className="rounded-xl border p-3">
+            <option value="">Todos os anos</option>
+            {grades.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
+              </option>
+            ))}
+          </select>
+          <select value={resultClassLetter} onChange={(e) => setResultClassLetter(e.target.value)} className="rounded-xl border p-3">
+            <option value="">Todas as turmas</option>
+            {['A', 'B', 'C'].map((letter) => (
+              <option key={letter} value={letter}>
+                {letter}
+              </option>
+            ))}
+          </select>
+        </div>
+        <ul className="mt-4 space-y-2">
           {results.map((r) => (
             <li key={r.id} className="flex items-center justify-between rounded-lg border p-3">
               <span>
@@ -166,6 +215,11 @@ export function AdminDashboardPage() {
             </li>
           ))}
         </ul>
+        {!results.length && (
+          <p className="mt-4 rounded-lg bg-amber-100 p-3 text-center font-semibold">
+            Nenhum resultado para este filtro.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2">

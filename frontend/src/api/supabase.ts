@@ -110,12 +110,20 @@ export async function createVote(candidateId: number) {
   if (error) throw error;
 }
 
-export async function fetchResults(): Promise<ResultRow[]> {
-  const { data, error } = await getSupabase()
+export async function fetchResults(filters?: { gradeYear?: string; classLetter?: 'A' | 'B' | 'C' }): Promise<ResultRow[]> {
+  let query = getSupabase()
     .from('candidates')
     .select('id, name, grade_year, class_letter, votes(count)')
     .eq('status', 'APROVADO');
 
+  if (filters?.gradeYear) {
+    query = query.eq('grade_year', filters.gradeYear);
+  }
+  if (filters?.classLetter) {
+    query = query.eq('class_letter', filters.classLetter);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
 
   const mapped =
