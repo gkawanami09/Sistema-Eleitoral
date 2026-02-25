@@ -1,11 +1,11 @@
 ﻿# Sistema Eleitoral (Supabase + Vercel)
 
-Sistema web para cadastro de candidaturas, votacao e administracao com controle de fase. Esta versao usa **frontend direto no Supabase** (PostgreSQL + Auth), ideal para deploy simples na Vercel.
+Sistema web para cadastro de candidaturas, votação e administração com controle de fase.
 
 ## Arquitetura (visao geral)
-- Frontend: React + Vite + TypeScript + Tailwind
-- Dados/Auth: Supabase (PostgreSQL + Auth)
-- Deploy: Vercel (apenas o frontend)
+- Frontend: React + Vite
+- Dados/Auth: Supabase 
+- Deploy: Vercel
 
 ## Setup local
 
